@@ -11,6 +11,7 @@ Chrome extension that adds new 'Cookies' tab in devtools.
  * Add
  * Edit
  * Sort
+ * Import / Export
 
 # Credits
  * [jQuery](http://jquery.com/)
