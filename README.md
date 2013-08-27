@@ -15,3 +15,4 @@ Chrome extension that adds new 'Cookies' tab in devtools.
 # Credits
  * [jQuery](http://jquery.com/)
  * [ContextJS](http://contextjs.com/)
+ * [Oxygen Cookie Icon](www.oxygen-icons.org)
