@@ -2,6 +2,8 @@
  * Context.js
  * Copyright Jacob Kelley
  * MIT License
+ *
+ * (modified!)
  */
 
 var context = context || (function () {

@@ -1,8 +1,8 @@
 {
-  "name": "Cookies manager",
-  "version": "1.0.2",
+  "name": "Almost Native Cookies Manager",
+  "version": "0.3.0",
   "manifest_version": 2,
-  "description": "Almost native cookie manager.",
+  "description": "Look for me in devtools.",
   "devtools_page": "devtools.html",
   "background": { "scripts": ["js/background.js"] },
   "permissions": [

@@ -3,7 +3,17 @@ Almost Native Cookie Manager
 
 Chrome extension that adds new 'Cookies' tab in devtools.
 
-Under Development.
+Implemented Features
+---------------------------------
+ * List of cookies with details (Refresh)
+ * Clear Cookies
+ * Remove Cookie
+
+Planned Features
+---------------------------------
+ * Add Cookie
+ * Edit Cookie
+ * Sorting
 
 Credits
 =============================================
