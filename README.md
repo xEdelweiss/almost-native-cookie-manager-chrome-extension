@@ -10,7 +10,7 @@ Chrome extension that adds new 'Cookies' tab in devtools.
 ### Planned Features
  * Add
  * Edit
- * Sorting
+ * Sort
 
 # Credits
  * [ContextJS](http://contextjs.com/) by Jacob Kelley
