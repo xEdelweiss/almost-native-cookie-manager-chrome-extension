@@ -1,0 +1,14 @@
+{
+  "name": "Cookies manager",
+  "version": "1.0.2",
+  "manifest_version": 2,
+  "description": "Almost native cookie manager.",
+  "devtools_page": "devtools.html",
+  "background": { "scripts": ["js/background.js"] },
+  "permissions": [
+    "tabs",
+    "cookies",
+    "http://*/*",
+    "https://*/*"
+  ]
+}
