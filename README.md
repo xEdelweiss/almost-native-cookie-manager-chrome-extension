@@ -4,12 +4,12 @@ Chrome extension that adds new 'Cookies' tab in devtools.
 
 ### Implemented Features
  * List of cookies with details (Refresh)
- * Clear Cookies
- * Remove Cookie
+ * Clear
+ * Remove
 
 ### Planned Features
- * Add Cookie
- * Edit Cookie
+ * Add
+ * Edit
  * Sorting
 
 # Credits
