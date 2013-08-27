@@ -1,20 +1,17 @@
-Almost Native Cookie Manager
-=============================================
+# Almost Native Cookie Manager
 
 Chrome extension that adds new 'Cookies' tab in devtools.
 
-Implemented Features
----------------------------------
+### Implemented Features
  * List of cookies with details (Refresh)
- * Clear Cookies
- * Remove Cookie
+ * Clear
+ * Remove
 
-Planned Features
----------------------------------
- * Add Cookie
- * Edit Cookie
- * Sorting
+### Planned Features
+ * Add
+ * Edit
+ * Sort
 
-Credits
-=============================================
- * [ContextJS](http://contextjs.com/) by Jacob Kelley
+# Credits
+ * [jQuery](http://jquery.com/)
+ * [ContextJS](http://contextjs.com/)
