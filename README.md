@@ -1,4 +1,4 @@
-almost-native-cookie-manager-chrome-extension
+Almost Native Cookie Manager
 =============================================
 
 Chrome extension that adds new 'Cookies' tab in devtools.
