@@ -42,5 +42,42 @@
             </tr>
         </table>
     </div>
+
+    <div id="overlay"></div>
+    <div class="modal" id="add_cookie_modal">
+        <form>
+            <div class="row">
+                <input class="w10" type="text" value="" placeholder="Name" />
+            </div>
+            <div class="row">
+                <input class="w10" type="text" value="" placeholder="Value" />
+            </div>
+            <div class="row">
+                <input class="w10" type="text" value="" placeholder="URL" />
+            </div>
+            <div class="row">
+                <input class="w10" type="text" value="" placeholder="Domain" />
+            </div>
+            <div class="row">
+                <input class="w10" type="text" value="" placeholder="Path" />
+            </div>
+            <div class="row">
+                <input class="w6" type="datetime-local" value="" />
+                <label class="w4">&nbsp;Empty for Session</label>
+            </div>
+            <div class="row">
+                <input class="w10" type="text" value="" placeholder="Store ID" />
+            </div>
+            <div class="row">
+                <label class="w5"><input type="checkbox" /> HTTP only</label>
+                <label class="w5"><input type="checkbox" /> Secure</label>
+            </div>
+
+            <div class="button_panel">
+                <button class="default">Add</button>
+                <button class="cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

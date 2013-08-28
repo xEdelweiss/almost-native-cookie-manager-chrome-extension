@@ -85,3 +85,103 @@ context
     background: none;
     background-color: rgb(239,239,239);
 }
+
+/*
+modal
+*/
+
+.modal {
+    z-index: 500;
+    position: absolute;
+    display: none;
+    bottom: 50px;
+    right: 50px;
+}
+
+.modal form {
+    width: 300px;
+    /*margin: 0 auto;*/
+    padding: 15px 8px 10px 8px;
+    background-color: whitesmoke;
+    border-radius: 2px;
+
+    border: 1px solid silver;
+    box-shadow: 5px 5px 3px -3px rgba(0, 0, 0, 0.55);
+}
+
+.modal form .row {
+    margin-bottom: 3px;
+    white-space: nowrap;
+}
+
+.modal form .w4 {
+    width: 40%;
+    display: inline-block;
+}
+
+.modal form .w5 {
+    width: 50%;
+    display: inline-block;
+}
+
+.modal form .w6 {
+    width: 60%;
+    display: inline-block;
+}
+
+.modal form .w10 {
+    width: 100%;
+    display: block;
+}
+
+.modal form input {
+    border: 1px solid silver; /*#e0e0e0;*/
+    padding: 4px 5px;
+    border-radius: 2px;
+    margin: 0;
+}
+
+.modal form input[type=checkbox] {
+    top: 3px;
+    position: relative;
+}
+
+.modal form input[type="datetime-local"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.modal form label {
+    font-size: 12px;
+    padding: 5px 0;
+    display: block;
+}
+
+.modal form .button_panel {
+    margin-top: 5px;
+    text-align: right;
+}
+
+.modal form button {
+    border: 1px solid silver; /*#5B8FFD;*/
+    padding: 4px 20px;
+    border-radius: 2px;
+    background: whitesmoke;
+    margin: 1px;
+}
+
+.modal form button.default {
+    /*font-weight: bold;*/
+}
+
+#overlay {
+    z-index: 490;
+    position: fixed;
+    z-index:100;
+    top: 0px;
+    left: 0px;
+    height:100%;
+    width:100%;
+    background: rgba(0,0,0,0.2);
+    display: none;
+}

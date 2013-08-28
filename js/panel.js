@@ -1,7 +1,3 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 $(function(){
 
     // menus
@@ -16,7 +12,7 @@ $(function(){
             text: '<s>Add cookie</s>',
             action: function(e){
                 e.preventDefault();
-                alert('Do Something');
+                showModal('add_cookie_modal');
             }
         },
         {
@@ -38,7 +34,8 @@ $(function(){
             text: '<s>Edit cookie</s>',
             action: function(e){
                 e.preventDefault();
-                alert('Do Something');
+                cancelActiveModal();
+                // alert('Do Something');
             }
         },
         {
@@ -57,6 +54,21 @@ $(function(){
         });
     }
 
+    function showModal(id)
+    {
+        $('#overlay').fadeIn(50);
+        $('#'+id).fadeIn(50).addClass('active');
+    }
+
+    function cancelActiveModal()
+    {
+        if ($('.modal.active').length > 0 && confirm('This will close active popup. Continue?')) {
+            $('.modal.active').find('.cancel').trigger('click');
+        } else {
+            return;
+        }
+    }
+
     function showNoCookies()
     {
         $('#cookies').hide();
@@ -73,18 +85,6 @@ $(function(){
     {
         $('tr.cookie').removeClass('active');
         $(this).addClass('active');
-    }
-
-    function dump(obj) {
-        var out = "";
-        if(obj && typeof(obj) == "object"){
-            for (var i in obj) {
-                out += i + ": " + obj[i] + "\n";
-            }
-        } else {
-            out = obj;
-        }
-        $('#cookies').html('<pre>'+out+'</pre>');
     }
 
     function removeActiveCookie(e)
@@ -148,6 +148,7 @@ $(function(){
                 } else {
                     row.find('.expiration').text((new Date(cookie.expirationDate*1000)).toLocaleString())
                 }
+
                 row.removeClass().addClass('cookie');
 
                 $('#cookies').append(row);
@@ -168,8 +169,15 @@ $(function(){
     $('table').on('click', 'tr.cookie', toggleActiveRow);
     $('table').on('contextmenu', 'tr.cookie', toggleActiveRow);
 
+    $('.modal button.cancel').click(function(e){
+        $(this).closest('.modal').fadeOut(50);
+        $('#overlay').fadeOut(50);
+
+        e.preventDefault();
+    });
+
     context.init({
-        fadeSpeed: 100,
+        fadeSpeed: 50,
         filter: function ($obj){},
         above: 'auto',
         preventDoubleContext: true,
@@ -178,6 +186,8 @@ $(function(){
 
     context.attach('body', mainMenu);
     context.attach('tr.cookie', cookieMenu);
+
+    // @todo disable context menu on overlay
 
     refreshCookies();
 

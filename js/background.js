@@ -29,11 +29,6 @@ var onMessageListener = function(message, sender, sendResponse) {
             getCookies(function(cookies){
                 sendResponse(cookies);
             });
-            // chrome.tabs.query({"status":"complete","windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
-            //     chrome.cookies.getAll({"url":tab[0].url},function (cookies){
-            //         sendResponse(cookies);
-            //     });
-            // });
             break;
         case "clearCookies":
             getCookies(function(cookies){
@@ -50,4 +45,5 @@ var onMessageListener = function(message, sender, sendResponse) {
     }
     return true;
 }
+
 chrome.runtime.onMessage.addListener(onMessageListener);
