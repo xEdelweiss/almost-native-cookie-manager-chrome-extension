@@ -107,6 +107,15 @@ modal
 
     border: 1px solid silver;
     box-shadow: 5px 5px 3px -3px rgba(0, 0, 0, 0.55);
+
+    -webkit-transition-property: box-shadow;
+    -webkit-transition-duration: 0.3s;
+}
+
+.modal.focused form {
+    box-shadow: 5px 5px 13px -3px rgba(155, 0, 0, 0.55);
+    -webkit-transition-property: box-shadow;
+    -webkit-transition-duration: 0.3s;
 }
 
 .modal form .row {
