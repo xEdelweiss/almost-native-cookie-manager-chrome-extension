@@ -38,7 +38,9 @@ var onMessageListener = function(message, sender, sendResponse) {
         case "clearCookies":
             getCookies(function(cookies){
                 for (i in cookies) {
-                    removeCookie(cookies[i]);
+                    var cookie = cookies[i];
+                    cookie.url = getUrlForCookie(cookie);
+                    removeCookie(cookie);
                 }
                 sendResponse(true);
             });
@@ -53,6 +55,25 @@ var onMessageListener = function(message, sender, sendResponse) {
             break;
     }
     return true;
+}
+
+/**
+ * @todo copy-paste (!)
+ *
+ * @author http://stackoverflow.com/users/612202/dan-lee
+ * @see    http://stackoverflow.com/a/13230227
+ */
+function getUrlForCookie(cookie) {
+    var url = '';
+    // get prefix, like https://www.
+    url += cookie.secure ? 'https://' : 'http://';
+    url += cookie.domain.charAt(0) == '.' ? 'www' : '';
+
+    // append domain and path
+    url += cookie.domain;
+    url += cookie.path;
+
+    return url;
 }
 
 chrome.runtime.onMessage.addListener(onMessageListener);
