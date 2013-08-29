@@ -1,5 +1,5 @@
 chrome.devtools.panels.create(
     "Cookies",
-    "icon.png",
+    "icon32.png",
     "panel.html"
 );

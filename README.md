@@ -8,8 +8,8 @@ Chrome extension that adds new 'Cookies' tab in devtools.
  * Remove
 
 ### Planned Features
- * Add
- * Edit
+ * Add (in progress)
+ * Edit (in progress)
  * Sort
  * Import / Export
 
