@@ -42,7 +42,7 @@ $(function(){
                 text: 'Add cookie',
                 action: function(e){
                     e.preventDefault();
-                    showModal('add_cookie_modal');
+                    showEditCookie();
                 }
             },
             {
@@ -63,7 +63,10 @@ $(function(){
                 text: '<s>Edit cookie</s>',
                 action: function(e){
                     e.preventDefault();
-                    showModal('edit_cookie_modal'); // @todo think about it & DRY
+
+                    var row = $('tr.active').first();
+                    var cookie = getCookieFromRow(row);
+                    showEditCookie(cookie);
                 }
             },
             {
@@ -108,12 +111,76 @@ $(function(){
         });
     }
 
-    function showModal(id)
+    function showEditCookie(cookie)
     {
-        cancelActiveModal();
+        if (modalActive()) {
+            return;
+        }
 
-        $('#overlay').fadeIn(50);
-        $('#'+id).fadeIn(50).addClass('active');
+        chrome.runtime.sendMessage({
+                type: 'getPageInfo'
+        }, function(pageInfo) {
+
+            var modal = $('#edit-cookie');
+            var form = modal.find('form');
+
+            form.removeAttr('data-cookie');
+            form.find('[name="urlDecode"]').prop('checked', false);
+
+            // prepare data
+
+            var data = {};
+
+            if (cookie) {
+                data = cookie;
+                // log(data);
+            } else {
+                data.name = '';
+                data.value = '';
+                data.session = true;
+                data.storeId = '';
+                data.httpOnly = false;
+                data.expirationDate = '';
+
+                // log(data);
+            }
+
+            data.urlDecode = false;
+
+            // fill fields
+
+            if (typeof cookie == 'undefined') {
+                data.domain = pageInfo.domain;
+                data.path = pageInfo.path;
+                data.secure = pageInfo.secure;
+            }
+
+            if (data.expirationDate) {
+                var d = new Date(data.expirationDate*1000);
+                data.expirationDate = d.getFullYear()+'-'+('0' + (d.getMonth()+1)).slice(-2)+'-'+('0' + d.getDate()).slice(-2)+'T'+('0' + d.getHours()).slice(-2)+':'+('0' + d.getMinutes()).slice(-2); // i hate js
+            }
+
+            form.find('[name="expirationDate"]').val(data.expirationDate);
+            form.find('[name="session"]').prop('checked', data.session ? data.session : false).trigger('change');
+
+            form.find('[name="name"]').val(data.name);
+            form.find('[name="value"]').val(data.value);
+            form.find('[name="domain"]').val(data.domain);
+            form.find('[name="path"]').val(data.path);
+            form.find('[name="storeId"]').val(data.storeId);
+            form.find('[name="secure"]').prop('checked', data.secure);
+            form.find('[name="httpOnly"]').prop('checked', data.httpOnly);
+
+            if (cookie) {
+                form.attr('data-cookie', JSON.stringify(cookie));
+                form.find('button.submit').text('Update');
+            } else {
+                form.find('button.submit').text('Add');
+            }
+
+            $('#overlay').fadeIn(50);
+            modal.fadeIn(50).addClass('active');
+        });
     }
 
     function focusObject(obj) {
@@ -123,13 +190,14 @@ $(function(){
         }, 600);
     }
 
-    function cancelActiveModal()
+    function modalActive()
     {
         if ($('.modal.active').length > 0) {
             focusObject($('.modal.active'));
-        } else {
-            return;
+            return true;
         }
+
+        return false;
     }
 
     function highlightRow()
@@ -138,11 +206,7 @@ $(function(){
         $(this).addClass('active');
     }
 
-    function removeActiveCookie(e)
-    {
-        var row = $('tr.active').first();
-        var cookie = getCookieFromRow(row);
-
+    function removeCookie(cookie) {
         cookie.url = getUrlForCookie(cookie);
 
         chrome.runtime.sendMessage({
@@ -151,6 +215,14 @@ $(function(){
         }, function(resp){
             refreshCookies();
         });
+    }
+
+    function removeActiveCookie(e)
+    {
+        var row = $('tr.active').first();
+        var cookie = getCookieFromRow(row);
+
+        removeCookie(cookie);
 
         e.preventDefault();
     }
@@ -168,7 +240,7 @@ $(function(){
 
     function refreshCookies(e)
     {
-        log('refresh');
+        // log('refresh');
 
         chrome.runtime.sendMessage({
             type: 'getCookies'
@@ -240,7 +312,7 @@ $(function(){
         e.preventDefault();
     });
 
-    $('#add_cookie_modal button.submit').click(function(e){
+    $('#edit-cookie button.submit').click(function(e){
         e.preventDefault();
 
         var form = $(this).closest('form');
@@ -280,6 +352,11 @@ $(function(){
 
         if (cookie.domain && cookie.path) {
             cookie.url = getUrlForCookie(cookie);
+        }
+
+        if (form.attr('data-cookie')) {
+            oldCookie = JSON.parse(form.attr('data-cookie'));
+            removeCookie(oldCookie);
         }
 
         createCookie(cookie);

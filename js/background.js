@@ -53,6 +53,22 @@ var onMessageListener = function(message, sender, sendResponse) {
             removeCookie(message.cookie);
             sendResponse(true);
             break;
+        case "getPageInfo":
+            chrome.tabs.query({"status":"complete","windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
+                var anchor = document.createElement('a');
+                anchor.href = tab[0].url;
+
+                var pageInfo = {
+                    protocol: anchor.protocol,
+                    secure: anchor.protocol == 'https:',
+                    pathname: anchor.pathname,
+                    path: anchor.pathname.substring(0, anchor.pathname.lastIndexOf('/')),
+                    domain: anchor.host,
+                    port: anchor.port
+                };
+                sendResponse(pageInfo);
+            });
+            break;
     }
     return true;
 }
