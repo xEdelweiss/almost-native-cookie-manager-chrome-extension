@@ -1,12 +1,19 @@
 var removeCookie = function(cookie) {
     console.log(cookie);
 
+    chrome.cookies.remove({
+        url: cookie.url,
+        name: cookie.name,
+        storeId: cookie.storeId,
+    });
+}
+
+var createCookie = function(cookie) {
     chrome.tabs.query({"status":"complete","windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
-        chrome.cookies.remove({
-            url: tab[0].url,
-            name: cookie.name,
-            storeId: cookie.storeId,
-        });
+        if (!cookie.url) {
+            cookie.url = tab[0].url;
+        }
+        chrome.cookies.set(cookie);
     });
 }
 
@@ -19,8 +26,6 @@ var getCookies = function(callback) {
 }
 
 var onMessageListener = function(message, sender, sendResponse) {
-    console.log(message);
-
     switch(message.type) {
         case "log":
             console.log(message.obj);
@@ -37,6 +42,10 @@ var onMessageListener = function(message, sender, sendResponse) {
                 }
                 sendResponse(true);
             });
+            break;
+        case "createCookie":
+            createCookie(message.cookie);
+            sendResponse(true);
             break;
         case "removeCookie":
             removeCookie(message.cookie);

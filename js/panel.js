@@ -1,5 +1,34 @@
 $(function(){
 
+    // @todo move to file
+    jQuery.fn.serializeObject = function() {
+      var arrayData, objectData;
+      arrayData = this.serializeArray();
+      objectData = {};
+
+      $.each(arrayData, function() {
+        var value;
+
+        if (this.value != null) {
+          value = this.value;
+        } else {
+          value = '';
+        }
+
+        if (objectData[this.name] != null) {
+          if (!objectData[this.name].push) {
+            objectData[this.name] = [objectData[this.name]];
+          }
+
+          objectData[this.name].push(value);
+        } else {
+          objectData[this.name] = value;
+        }
+      });
+
+      return objectData;
+    };
+
     // menus
 
     var menus = {
@@ -10,7 +39,7 @@ $(function(){
             },
             {divider: true},
             {
-                text: '<s>Add cookie</s>',
+                text: 'Add cookie',
                 action: function(e){
                     e.preventDefault();
                     showModal('add_cookie_modal');
@@ -54,26 +83,6 @@ $(function(){
         });
     }
 
-    function showModal(id)
-    {
-        cancelActiveModal();
-
-        $('#overlay').fadeIn(50);
-        $('#'+id).fadeIn(50).addClass('active');
-    }
-
-    function cancelActiveModal()
-    {
-        if ($('.modal.active').length > 0) {
-            $('.modal.active').addClass('focused');
-            setTimeout(function(){
-                $('.modal.active').removeClass('focused');
-            }, 600);
-        } else {
-            return;
-        }
-    }
-
     function showNoCookies()
     {
         $('#cookies').hide();
@@ -86,6 +95,43 @@ $(function(){
         $('#no_cookies').hide();
     }
 
+    function getCookieFromRow(row) {
+        return JSON.parse(row.attr('data-cookie'));
+    }
+
+    function createCookie(cookie) {
+        chrome.runtime.sendMessage({
+            type: 'createCookie',
+            cookie: cookie,
+        }, function(resp){
+            refreshCookies();
+        });
+    }
+
+    function showModal(id)
+    {
+        cancelActiveModal();
+
+        $('#overlay').fadeIn(50);
+        $('#'+id).fadeIn(50).addClass('active');
+    }
+
+    function focusObject(obj) {
+        $(obj).addClass('focused');
+        setTimeout(function(){
+            $(obj).removeClass('focused');
+        }, 600);
+    }
+
+    function cancelActiveModal()
+    {
+        if ($('.modal.active').length > 0) {
+            focusObject($('.modal.active'));
+        } else {
+            return;
+        }
+    }
+
     function highlightRow()
     {
         $('tr.cookie').removeClass('active');
@@ -94,13 +140,10 @@ $(function(){
 
     function removeActiveCookie(e)
     {
-        log('remove');
-
         var row = $('tr.active').first();
-        var cookie = {
-            name: row.find('.name').text(),
-            storeId: row.find('.storeId').text(),
-        };
+        var cookie = getCookieFromRow(row);
+
+        cookie.url = getUrlForCookie(cookie);
 
         chrome.runtime.sendMessage({
             type: 'removeCookie',
@@ -114,8 +157,6 @@ $(function(){
 
     function clearCookies(e)
     {
-        log('clear');
-
         chrome.runtime.sendMessage({
             type: 'clearCookies',
         }, function(resp){
@@ -154,6 +195,7 @@ $(function(){
                     row.find('.expiration').text((new Date(cookie.expirationDate*1000)).toLocaleString())
                 }
 
+                row.attr('data-cookie', JSON.stringify(cookie));
                 row.removeClass().addClass('cookie');
 
                 $('#cookies').append(row);
@@ -169,6 +211,23 @@ $(function(){
         e.preventDefault();
     }
 
+    /**
+     * @author http://stackoverflow.com/users/612202/dan-lee
+     * @see    http://stackoverflow.com/a/13230227
+     */
+    function getUrlForCookie(cookie) {
+        var url = '';
+        // get prefix, like https://www.
+        url += cookie.secure ? 'https://' : 'http://';
+        url += cookie.domain.charAt(0) == '.' ? 'www' : '';
+
+        // append domain and path
+        url += cookie.domain;
+        url += cookie.path;
+
+        return url;
+    }
+
     // magic
 
     $('table').on('click', 'tr.cookie', highlightRow);
@@ -180,6 +239,58 @@ $(function(){
 
         e.preventDefault();
     });
+
+    $('#add_cookie_modal button.submit').click(function(e){
+        e.preventDefault();
+
+        var form = $(this).closest('form');
+        var cookie = form.serializeObject();
+
+        var findByName = function(name) {
+            return form.find('[name="'+name+'"]');
+        }
+
+        var errors = [];
+
+        if (!cookie.session && !cookie.expirationDate) {
+            errors.push('expirationDate');
+        }
+
+        for (i in errors) {
+            focusObject(findByName(errors[i]));
+        }
+
+        if (errors.length > 0) {
+            return;
+        }
+
+
+        if (cookie.session) {
+            delete cookie.expirationDate;
+            delete cookie.session;
+        } else {
+            var tmpDate = new Date(cookie.expirationDate);
+            cookie.expirationDate = (tmpDate.getTime() + tmpDate.getTimezoneOffset()*60*1000)/1000;
+        }
+
+        if (cookie.urlDecode) {
+            cookie.value = decodeURIComponent(cookie.value);
+            delete cookie.urlDecode;
+        }
+
+        if (cookie.domain && cookie.path) {
+            cookie.url = getUrlForCookie(cookie);
+        }
+
+        createCookie(cookie);
+
+        $(this).closest('.modal').fadeOut(50).removeClass('active');
+        $('#overlay').fadeOut(50);
+    });
+
+    $('#edit-cookie-session').change(function(){
+        $('#edit-cookie-datetime').prop('disabled', $('#edit-cookie-session').prop('checked'));
+    }).trigger('change');
 
     context.init({
         fadeSpeed: 50,

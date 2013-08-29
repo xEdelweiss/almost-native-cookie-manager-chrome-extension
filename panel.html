@@ -47,34 +47,34 @@
     <div class="modal" id="add_cookie_modal">
         <form>
             <div class="row">
-                <input class="w10" type="text" value="" placeholder="Name" />
+                <input name="name" class="w10" type="text" value="" placeholder="Name" />
             </div>
             <div class="row">
-                <input class="w10" type="text" value="" placeholder="Value" />
+                <textarea name="value" placeholder="Value"></textarea>
             </div>
             <div class="row">
-                <input class="w10" type="text" value="" placeholder="URL" />
+                <label class="w5"><input name="urlDecode" type="checkbox" /> URL decode value before submit</label>
             </div>
             <div class="row">
-                <input class="w10" type="text" value="" placeholder="Domain" />
+                <input name="domain" class="w10" type="text" value="" placeholder="Domain" />
             </div>
             <div class="row">
-                <input class="w10" type="text" value="" placeholder="Path" />
+                <input name="path" class="w10" type="text" value="" placeholder="Path" />
             </div>
             <div class="row">
-                <input class="w6" type="datetime-local" value="" />
-                <label class="w4">&nbsp;Empty for Session</label>
+                <input name="expirationDate" id="edit-cookie-datetime" class="w6" type="datetime-local" value="" />
+                <label class="w4"><input name="session" id="edit-cookie-session" type="checkbox" checked /> Session</label>
             </div>
             <div class="row">
-                <input class="w10" type="text" value="" placeholder="Store ID" />
+                <input name="storeId" class="w10" type="text" value="" placeholder="Store ID" />
             </div>
             <div class="row">
-                <label class="w5"><input type="checkbox" /> HTTP only</label>
-                <label class="w5"><input type="checkbox" /> Secure</label>
+                <label class="w5"><input name="httpOnly" type="checkbox" /> HTTP only</label>
+                <label class="w5"><input name="secure" type="checkbox" /> Secure</label>
             </div>
 
             <div class="button_panel">
-                <button class="default">Add</button>
+                <button class="submit default">Add</button>
                 <button class="cancel">Cancel</button>
             </div>
         </form>

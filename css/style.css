@@ -118,6 +118,18 @@ modal
     -webkit-transition-duration: 0.3s;
 }
 
+input {
+    -webkit-transition-property: box-shadow;
+    -webkit-transition-duration: 0.3s;
+}
+
+input.focused {
+    box-shadow: 0 0 2px rgba(255, 0, 0, 0.75);
+
+    -webkit-transition-property: box-shadow;
+    -webkit-transition-duration: 0.3s;
+}
+
 .modal form .row {
     margin-bottom: 3px;
     white-space: nowrap;
@@ -143,11 +155,19 @@ modal
     display: block;
 }
 
-.modal form input {
+.modal form input,
+.modal form textarea {
     border: 1px solid silver; /*#e0e0e0;*/
     padding: 4px 5px;
     border-radius: 2px;
     margin: 0;
+}
+
+.modal form textarea {
+    min-height: 100px;
+    max-height: 100px;
+    min-width: 100%;
+    max-width: 100%;
 }
 
 .modal form input[type=checkbox] {
