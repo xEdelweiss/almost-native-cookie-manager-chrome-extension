@@ -133,7 +133,6 @@ $(function(){
 
             if (cookie) {
                 data = cookie;
-                // log(data);
             } else {
                 data.name = '';
                 data.value = '';
@@ -141,8 +140,6 @@ $(function(){
                 data.storeId = '';
                 data.httpOnly = false;
                 data.expirationDate = '';
-
-                // log(data);
             }
 
             data.urlDecode = false;
@@ -178,7 +175,7 @@ $(function(){
                 form.find('button.submit').text('Add');
             }
 
-            $('#overlay').fadeIn(50);
+            // $('#overlay').fadeIn(50);
             modal.fadeIn(50).addClass('active');
         });
     }
@@ -240,8 +237,6 @@ $(function(){
 
     function refreshCookies(e)
     {
-        // log('refresh');
-
         chrome.runtime.sendMessage({
             type: 'getCookies'
         }, function(cookies){
@@ -307,7 +302,7 @@ $(function(){
 
     $('.modal button.cancel').click(function(e){
         $(this).closest('.modal').fadeOut(50).removeClass('active');
-        $('#overlay').fadeOut(50);
+        // $('#overlay').fadeOut(50);
 
         e.preventDefault();
     });
@@ -362,7 +357,7 @@ $(function(){
         createCookie(cookie);
 
         $(this).closest('.modal').fadeOut(50).removeClass('active');
-        $('#overlay').fadeOut(50);
+        // $('#overlay').fadeOut(50);
     });
 
     $('#edit-cookie-session').change(function(){
