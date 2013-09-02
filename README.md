@@ -8,13 +8,10 @@ Chrome extension that adds new 'Cookies' tab in devtools.
  * Edit
  * Remove
  * Clear
+ * Import / Export
 
 ### Planned Features
  * Sort
- * Import / Export
-
-### Bugs & Todos
- * Check 'Add Cookie' with secure/httpOnly/storyId
 
 # Credits
  * [jQuery](http://jquery.com/)

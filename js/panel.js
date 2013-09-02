@@ -22,7 +22,7 @@ $(function(){
             },
             {divider: true},
             {
-                text: 'Add cookie..',
+                text: '<b>Add cookie..</b>',
                 action: function(e){
                     e.preventDefault();
                     showEditCookie();
@@ -37,16 +37,38 @@ $(function(){
             },
             {divider: true},
             {
-                text: '<s>About..</s>',
+                text: 'Export cookies to JSON..',
                 action: function(e){
                     e.preventDefault();
-                    // action!
+                    exportCookies();
+                },
+            },
+            {
+                text: 'Import cookies from JSON..',
+                action: function(e){
+                    e.preventDefault();
+                    showImportCookies();
+                },
+            },
+            {divider: true},
+            {
+                text: 'Extensions..',
+                action: function(e){
+                    e.preventDefault();
+                    openUrl('chrome://extensions/');
+                }
+            },
+            {
+                text: 'About..',
+                action: function(e){
+                    e.preventDefault();
+                    openUrl('https://github.com/xEdelweiss/almost-native-cookie-manager-chrome-extension');
                 }
             },
         ],
         cookie: [
             {
-                text: 'Edit cookie..',
+                text: '<b>Edit cookie..</b>',
                 action: function(e){
                     e.preventDefault();
 
@@ -73,6 +95,14 @@ $(function(){
         chrome.runtime.sendMessage({
             type: 'log',
             obj: what
+        });
+    }
+
+    function openUrl(url)
+    {
+        chrome.runtime.sendMessage({
+            type: 'openUrl',
+            url: url
         });
     }
 
@@ -105,12 +135,52 @@ $(function(){
         });
     }
 
-    function getHighlightedCookie() {
-        var row = $('tr.active').first();
-        return JSON.parse(row.attr('data-cookie'));
+    function getPageInfo(callback)
+    {
+        chrome.runtime.sendMessage({
+                type: 'getPageInfo'
+        }, callback);
     }
 
     // functions
+
+    function getCookieFromRow(row) {
+        return JSON.parse(row.attr('data-cookie'))
+    }
+
+    function getHighlightedCookie() {
+        var row = $('tr.active').first();
+        return getCookieFromRow(row);
+    }
+
+    function exportCookies()
+    {
+        getPageInfo(function(pageInfo) {
+            chrome.runtime.sendMessage({
+                type: 'getCookies'
+            }, function(cookies){
+                comment = '/*\n url: '+pageInfo.url+'\n data: '+(new Date).toLocaleString()+'\n*/\n';
+                url = 'data:application/json;charset=utf-8;base64,'+btoa(comment+JSON.stringify(cookies));
+
+                openUrl(url);
+            });
+        });
+    }
+
+    function showImportCookies()
+    {
+        if (modalActive()) {
+            return;
+        }
+
+         var modal = $('#import-cookies');
+         var form = modal.find('form');
+
+         form.find('[name="cookies"]').val('');
+
+         modal.fadeIn(50).addClass('active')
+            .find('[name="cookies"]').focus();
+    }
 
     function showEditCookie(cookie)
     {
@@ -118,9 +188,7 @@ $(function(){
             return;
         }
 
-        chrome.runtime.sendMessage({
-                type: 'getPageInfo'
-        }, function(pageInfo) {
+        getPageInfo(function(pageInfo) {
 
             var modal = $('#edit-cookie');
             var form = modal.find('form');
@@ -176,7 +244,8 @@ $(function(){
                 form.find('button.submit').text('Add');
             }
 
-            modal.fadeIn(50).addClass('active');
+            modal.fadeIn(50).addClass('active')
+                .find('[name="name"]').focus();
         });
     }
 
@@ -264,9 +333,54 @@ $(function(){
         $(this).addClass('active');
     });
 
+    $('table').on('dblclick', 'tr.cookie', function(e){
+        e.stopPropagation();
+
+        var cookie = getHighlightedCookie();
+        showEditCookie(cookie);
+    });
+
+    $('body').dblclick(function(e){
+        showEditCookie();
+    });
+
     $('.modal button.cancel').click(function(e){
         e.preventDefault();
 
+        $(this).closest('.modal').fadeOut(50).removeClass('active');
+    });
+
+    $('#import-cookies button.submit').click(function(e){
+        e.preventDefault();
+
+        var form = $(this).closest('form');
+        var data = form.serializeObject();
+
+        var cookies = JSON.parse(data.cookies.replace(/\/\*[\s\S]*\*\//,''));
+
+        getPageInfo(function(pageInfo) {
+            for(i in cookies) {
+                var cookie = cookies[i];
+
+                // if (data.replaceUrl) {
+                    cookie.domain = pageInfo.domain;
+                    cookie.path = pageInfo.path;
+                    cookie.url = getUrlForCookie(cookie);
+                // }
+
+                if (cookie.session) {
+                    delete cookie.expirationDate;
+                }
+                delete cookie.session;
+
+                if (!cookie.secure) delete cookie.secure;
+                if (!cookie.httpOnly) delete cookie.httpOnly;
+                delete cookie.hostOnly;
+
+                createCookie(cookie);
+            }
+            refreshCookies();
+        });
         $(this).closest('.modal').fadeOut(50).removeClass('active');
     });
 

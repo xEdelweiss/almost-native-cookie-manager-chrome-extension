@@ -91,6 +91,7 @@ modal
 */
 
 .modal {
+    width: 300px;
     z-index: 500;
     position: absolute;
     display: none;
@@ -98,8 +99,13 @@ modal
     right: 50px;
 }
 
+#import-cookies.modal {
+    width: 90%;
+    right: 5%;
+}
+
 .modal form {
-    width: 300px;
+    width: 100%;
     /*margin: 0 auto;*/
     padding: 15px 8px 10px 8px;
     background-color: whitesmoke;

@@ -74,6 +74,11 @@ var onMessageListener = function(message, sender, sendResponse) {
         case "log":
             console.log(message.obj);
             break;
+        case "openUrl":
+            chrome.tabs.create({
+                url: message.url
+            });
+            break;
         case "getCookies":
             getCookies(function(cookies){
                 sendResponse(cookies);
@@ -103,6 +108,7 @@ var onMessageListener = function(message, sender, sendResponse) {
                 anchor.href = tab[0].url;
 
                 var pageInfo = {
+                    url: anchor.href,
                     protocol: anchor.protocol,
                     secure: anchor.protocol == 'https:',
                     pathname: anchor.pathname,
