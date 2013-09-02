@@ -2,7 +2,7 @@
     "name": "Almost Native Cookies Manager",
     "version": "0.8.6",
     "manifest_version": 2,
-    "description": "Look for me in devtools.",
+    "description": "Cookie Manager embedded in the Chrome devtools.",
     "devtools_page": "devtools.html",
     "background": {
         "scripts": ["js/background.js"]
