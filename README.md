@@ -1,5 +1,7 @@
 # Almost Native Cookie Manager
 
+<img align="right" width="128" height="128" src="https://raw.github.com/xEdelweiss/almost-native-cookie-manager-chrome-extension/master/img/icon128.png">
+
 Chrome extension that adds new 'Cookies' tab in devtools.
 
 ### Implemented Features
