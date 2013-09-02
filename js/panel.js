@@ -298,6 +298,14 @@ $(function(){
             cookie.expirationDate = (tmpDate.getTime() + tmpDate.getTimezoneOffset()*60*1000)/1000;
         }
 
+        if (cookie.httpOnly) {
+            cookie.httpOnly = true;
+        }
+
+        if (cookie.secure) {
+            cookie.secure = true;
+        }
+
         if (cookie.urlDecode) {
             cookie.value = decodeURIComponent(cookie.value);
             delete cookie.urlDecode;
