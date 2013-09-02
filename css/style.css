@@ -4,6 +4,10 @@ body {
     font-family: Lucida Grande, sans-serif;
 }
 
+#list {
+    padding-bottom: 150px;
+}
+
 #list table {
     width: 100%;
     display: none;
