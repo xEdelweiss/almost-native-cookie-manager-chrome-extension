@@ -1,3 +1,29 @@
+var ports = {};
+chrome.extension.onConnect.addListener(function(port) {
+    if (port.name !== "ancm") return;
+
+    ports[port.portId_] = port;
+
+    port.onDisconnect.addListener(function(port) {
+        delete ports[port.portId_];
+    });
+
+    port.onMessage.addListener(function(msg) {
+        // var callback = msg.callback;
+        // var type = msg.type;
+
+        // Whatever you wish
+        console.log(msg);
+    });
+});
+
+// Function to send a message to all devtool.html views:
+function notifyDevtoolsTab(msg) {
+    Object.keys(ports).forEach(function(portId_) {
+        ports[portId_].postMessage(msg);
+    });
+}
+
 var removeCookie = function(cookie) {
     console.log(cookie);
 
@@ -9,7 +35,7 @@ var removeCookie = function(cookie) {
 }
 
 var createCookie = function(cookie) {
-    chrome.tabs.query({"status":"complete","windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
+    chrome.tabs.query({/*"status":"complete",*/"windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
         if (!cookie.url) {
             cookie.url = tab[0].url;
         }
@@ -18,13 +44,25 @@ var createCookie = function(cookie) {
 }
 
 var getCookies = function(callback) {
-    chrome.tabs.query({"status":"complete","windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
+    chrome.tabs.query({/*"status":"complete",*/"windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
         chrome.cookies.getAll({"url":tab[0].url},function (cookies){
             callback(cookies);
         });
     });
 }
 
+var onTabUpdatedListener = function(tabId, changeInfo, tab) {
+    if (changeInfo.url) {
+        console.log('url changed. notifying devtools');
+        notifyDevtoolsTab({
+            type: 'tabUpdated'
+        });
+    }
+}
+
+/**
+ * @todo think about it & port
+ */
 var onMessageListener = function(message, sender, sendResponse) {
     switch(message.type) {
         case "log":
@@ -54,7 +92,7 @@ var onMessageListener = function(message, sender, sendResponse) {
             sendResponse(true);
             break;
         case "getPageInfo":
-            chrome.tabs.query({"status":"complete","windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
+            chrome.tabs.query({/*"status":"complete",*/"windowId":chrome.windows.WINDOW_ID_CURRENT,"active":true}, function(tab){
                 var anchor = document.createElement('a');
                 anchor.href = tab[0].url;
 
@@ -74,10 +112,10 @@ var onMessageListener = function(message, sender, sendResponse) {
 }
 
 /**
- * @todo copy-paste (!)
- *
  * @author http://stackoverflow.com/users/612202/dan-lee
  * @see    http://stackoverflow.com/a/13230227
+ *
+ * @todo copy-paste
  */
 function getUrlForCookie(cookie) {
     var url = '';
@@ -93,3 +131,5 @@ function getUrlForCookie(cookie) {
 }
 
 chrome.runtime.onMessage.addListener(onMessageListener);
+
+chrome.tabs.onUpdated.addListener(onTabUpdatedListener);

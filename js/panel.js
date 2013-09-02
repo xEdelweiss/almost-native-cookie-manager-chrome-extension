@@ -1,33 +1,13 @@
 $(function(){
 
-    // @todo move to file
-    jQuery.fn.serializeObject = function() {
-      var arrayData, objectData;
-      arrayData = this.serializeArray();
-      objectData = {};
-
-      $.each(arrayData, function() {
-        var value;
-
-        if (this.value != null) {
-          value = this.value;
-        } else {
-          value = '';
+    // port
+    window.portReceiver = function(message) {
+        switch(message.type) {
+            case "tabUpdated":
+                refreshCookies();
+                break;
         }
-
-        if (objectData[this.name] != null) {
-          if (!objectData[this.name].push) {
-            objectData[this.name] = [objectData[this.name]];
-          }
-
-          objectData[this.name].push(value);
-        } else {
-          objectData[this.name] = value;
-        }
-      });
-
-      return objectData;
-    };
+    }
 
     // menus
 
@@ -35,11 +15,14 @@ $(function(){
         main: [
             {
                 text: 'Refresh',
-                action: refreshCookies,
+                action: function(e){
+                    e.preventDefault();
+                    refreshCookies();
+                },
             },
             {divider: true},
             {
-                text: 'Add cookie',
+                text: 'Add cookie..',
                 action: function(e){
                     e.preventDefault();
                     showEditCookie();
@@ -47,36 +30,43 @@ $(function(){
             },
             {
                 text: 'Clear cookies',
-                action: clearCookies,
+                action: function(e){
+                    e.preventDefault();
+                    clearCookies();
+                },
             },
             {divider: true},
             {
                 text: '<s>About..</s>',
                 action: function(e){
                     e.preventDefault();
-                    alert('Do Something');
+                    // action!
                 }
             },
         ],
         cookie: [
             {
-                text: '<s>Edit cookie</s>',
+                text: 'Edit cookie..',
                 action: function(e){
                     e.preventDefault();
 
-                    var row = $('tr.active').first();
-                    var cookie = getCookieFromRow(row);
+                    var cookie = getHighlightedCookie();
                     showEditCookie(cookie);
                 }
             },
             {
                 text: 'Remove cookie',
-                action: removeActiveCookie,
+                action: function(e){
+                    e.preventDefault();
+
+                    var cookie = getHighlightedCookie();
+                    removeCookie(cookie);
+                },
             },
         ],
     }
 
-    // functions
+    // background function wrappers
 
     function log(what)
     {
@@ -84,22 +74,6 @@ $(function(){
             type: 'log',
             obj: what
         });
-    }
-
-    function showNoCookies()
-    {
-        $('#cookies').hide();
-        $('#no_cookies').show();
-    }
-
-    function showCookiesTable()
-    {
-        $('#cookies').show();
-        $('#no_cookies').hide();
-    }
-
-    function getCookieFromRow(row) {
-        return JSON.parse(row.attr('data-cookie'));
     }
 
     function createCookie(cookie) {
@@ -110,6 +84,33 @@ $(function(){
             refreshCookies();
         });
     }
+
+    function removeCookie(cookie) {
+        cookie.url = getUrlForCookie(cookie);
+
+        chrome.runtime.sendMessage({
+            type: 'removeCookie',
+            cookie: cookie,
+        }, function(resp){
+            refreshCookies();
+        });
+    }
+
+    function clearCookies()
+    {
+        chrome.runtime.sendMessage({
+            type: 'clearCookies',
+        }, function(resp){
+            refreshCookies();
+        });
+    }
+
+    function getHighlightedCookie() {
+        var row = $('tr.active').first();
+        return JSON.parse(row.attr('data-cookie'));
+    }
+
+    // functions
 
     function showEditCookie(cookie)
     {
@@ -175,7 +176,6 @@ $(function(){
                 form.find('button.submit').text('Add');
             }
 
-            // $('#overlay').fadeIn(50);
             modal.fadeIn(50).addClass('active');
         });
     }
@@ -197,45 +197,7 @@ $(function(){
         return false;
     }
 
-    function highlightRow()
-    {
-        $('tr.cookie').removeClass('active');
-        $(this).addClass('active');
-    }
-
-    function removeCookie(cookie) {
-        cookie.url = getUrlForCookie(cookie);
-
-        chrome.runtime.sendMessage({
-            type: 'removeCookie',
-            cookie: cookie,
-        }, function(resp){
-            refreshCookies();
-        });
-    }
-
-    function removeActiveCookie(e)
-    {
-        var row = $('tr.active').first();
-        var cookie = getCookieFromRow(row);
-
-        removeCookie(cookie);
-
-        e.preventDefault();
-    }
-
-    function clearCookies(e)
-    {
-        chrome.runtime.sendMessage({
-            type: 'clearCookies',
-        }, function(resp){
-            showNoCookies();
-        });
-
-        e.preventDefault();
-    }
-
-    function refreshCookies(e)
+    function refreshCookies()
     {
         chrome.runtime.sendMessage({
             type: 'getCookies'
@@ -269,13 +231,13 @@ $(function(){
             }
 
             if (cookies.length == 0) {
-                showNoCookies();
+                $('#cookies').hide();
+                $('#no_cookies').show();
             } else {
-                showCookiesTable();
+                $('#cookies').show();
+                $('#no_cookies').hide();
             }
         });
-
-        e.preventDefault();
     }
 
     /**
@@ -295,16 +257,17 @@ $(function(){
         return url;
     }
 
-    // magic
+    // events
 
-    $('table').on('click', 'tr.cookie', highlightRow);
-    $('table').on('contextmenu', 'tr.cookie', highlightRow);
+    $('table').on('click contextmenu', 'tr.cookie', function(e){
+        $('tr.cookie').removeClass('active');
+        $(this).addClass('active');
+    });
 
     $('.modal button.cancel').click(function(e){
-        $(this).closest('.modal').fadeOut(50).removeClass('active');
-        // $('#overlay').fadeOut(50);
-
         e.preventDefault();
+
+        $(this).closest('.modal').fadeOut(50).removeClass('active');
     });
 
     $('#edit-cookie button.submit').click(function(e){
@@ -312,11 +275,6 @@ $(function(){
 
         var form = $(this).closest('form');
         var cookie = form.serializeObject();
-
-        var findByName = function(name) {
-            return form.find('[name="'+name+'"]');
-        }
-
         var errors = [];
 
         if (!cookie.session && !cookie.expirationDate) {
@@ -324,13 +282,13 @@ $(function(){
         }
 
         for (i in errors) {
-            focusObject(findByName(errors[i]));
+            var element = form.find('[name="'+errors[i]+'"]');
+            focusObject(element);
         }
 
         if (errors.length > 0) {
             return;
         }
-
 
         if (cookie.session) {
             delete cookie.expirationDate;
@@ -357,12 +315,13 @@ $(function(){
         createCookie(cookie);
 
         $(this).closest('.modal').fadeOut(50).removeClass('active');
-        // $('#overlay').fadeOut(50);
     });
 
-    $('#edit-cookie-session').change(function(){
-        $('#edit-cookie-datetime').prop('disabled', $('#edit-cookie-session').prop('checked'));
-    }).trigger('change');
+    $('[name="session"]').change(function(){
+        $(this).closest('form').find('[name="expirationDate"]').prop('disabled', $(this).prop('checked'));
+    });
+
+    // inits
 
     context.init({
         fadeSpeed: 50,
@@ -372,11 +331,10 @@ $(function(){
         compress: true
     });
 
-    context.attach('body', menus.main);
+    setTimeout(function(){ // to prevent same id for both menus
+        context.attach('body', menus.main);
+    }, 200);
     context.attach('tr.cookie', menus.cookie);
 
-    // @todo disable context menu on overlay
-
     refreshCookies();
-
 });
