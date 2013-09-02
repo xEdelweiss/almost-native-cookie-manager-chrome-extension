@@ -3,7 +3,7 @@ $(function(){
     // port
     window.portReceiver = function(message) {
         switch(message.type) {
-            case "tabUpdated":
+            case "refreshCookies":
                 refreshCookies();
                 break;
         }

@@ -55,9 +55,15 @@ var onTabUpdatedListener = function(tabId, changeInfo, tab) {
     if (changeInfo.url) {
         console.log('url changed. notifying devtools');
         notifyDevtoolsTab({
-            type: 'tabUpdated'
+            type: 'refreshCookies'
         });
     }
+}
+
+var onTabActivatedListener = function(activeInfo) {
+    notifyDevtoolsTab({
+        type: 'refreshCookies'
+    });
 }
 
 /**
@@ -133,3 +139,4 @@ function getUrlForCookie(cookie) {
 chrome.runtime.onMessage.addListener(onMessageListener);
 
 chrome.tabs.onUpdated.addListener(onTabUpdatedListener);
+chrome.tabs.onActivated.addListener(onTabActivatedListener);

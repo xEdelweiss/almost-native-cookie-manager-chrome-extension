@@ -1,6 +1,6 @@
 {
     "name": "Almost Native Cookies Manager",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "manifest_version": 2,
     "description": "Look for me in devtools.",
     "devtools_page": "devtools.html",
